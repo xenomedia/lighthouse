@@ -80,7 +80,22 @@ class CategoryRenderer {
     this._dom.find('.lh-score__description', element)
         .appendChild(this._dom.convertMarkdownLinkSnippets(description));
 
+    this._populateHelpLink(element, description);
+
     return /** @type {!Element} **/ (element);
+  }
+
+  /**
+   * @param {!DocumentFragment|!Element} element
+   * @param {string} helpText
+   */
+  _populateHelpLink(element, helpText) {
+    const firstLinkMatch = helpText.match(/]\((http[^\)]+)/);
+    const helpLink = element.querySelector('.lh-help-link');
+    if (helpLink && firstLinkMatch) {
+      helpLink.href = firstLinkMatch[1];
+      helpLink.classList.add('lh-help-link--visible');
+    }
   }
 
   /**
@@ -159,6 +174,8 @@ class CategoryRenderer {
         'lh-expandable-details__summary');
     const titleEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__title');
     titleEl.textContent = audit.result.description;
+    this._dom.createChildOf(summary, 'a', 'lh-help-link');
+    this._populateHelpLink(summary, audit.result.helpText);
 
     this._dom.createChildOf(summary, 'div', 'lh-toggle-arrow', {title: 'See resources'});
 

@@ -338,6 +338,33 @@ span.lh-node:hover {
   flex: 1;
 }
 
+.lh-help-link {
+  color: var(--informative-color);
+  border: 1px solid var(--informative-color);
+  width: var(--caption-line-height);
+  height: var(--caption-line-height);
+  line-height: var(--caption-line-height);
+  font-size: var(--caption-font-size);
+  border-radius: 50%;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  display: none;
+}
+
+.lh-help-link:hover {
+  color: white;
+  background: var(--informative-color);
+}
+
+.lh-help-link::after {
+  content: "?";
+}
+
+.lh-help-link--visible {
+  display: block;
+}
+
 .lh-toggle-arrow {
   background: var(--collapsed-icon-url) no-repeat center center / 12px 12px;
   background-color: transparent;
