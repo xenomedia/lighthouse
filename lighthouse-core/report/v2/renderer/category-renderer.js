@@ -75,12 +75,13 @@ class CategoryRenderer {
     valueEl.classList.add(`lh-score__value--${Util.calculateRating(score)}`,
         `lh-score__value--${scoringMode}`);
 
-    this._dom.find('.lh-score__title', element).appendChild(
-        this._dom.convertMarkdownCodeSnippets(title));
+    const titleEl = this._dom.find('.lh-score__title', element);
+    titleEl.appendChild(this._dom.convertMarkdownCodeSnippets(title));
+    this._dom.createChildOf(titleEl, 'a', 'lh-help-link');
+    this._populateHelpLink(titleEl, description);
+
     this._dom.find('.lh-score__description', element)
         .appendChild(this._dom.convertMarkdownLinkSnippets(description));
-
-    this._populateHelpLink(element, description);
 
     return /** @type {!Element} **/ (element);
   }
@@ -90,10 +91,12 @@ class CategoryRenderer {
    * @param {string} helpText
    */
   _populateHelpLink(element, helpText) {
-    const firstLinkMatch = helpText.match(/]\((http[^\)]+)/);
+    const lastLinkMatch = helpText.match(/.*]\((http[^\)]+)/);
     const helpLink = element.querySelector('.lh-help-link');
-    if (helpLink && firstLinkMatch) {
-      helpLink.href = firstLinkMatch[1];
+    if (helpLink && lastLinkMatch) {
+      helpLink.href = lastLinkMatch[1];
+      helpLink.target = '_blank';
+      helpLink.rel = 'noopener';
       helpLink.classList.add('lh-help-link--visible');
     }
   }
@@ -174,8 +177,8 @@ class CategoryRenderer {
         'lh-expandable-details__summary');
     const titleEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__title');
     titleEl.textContent = audit.result.description;
-    this._dom.createChildOf(summary, 'a', 'lh-help-link');
-    this._populateHelpLink(summary, audit.result.helpText);
+    this._dom.createChildOf(titleEl, 'a', 'lh-help-link');
+    this._populateHelpLink(titleEl, audit.result.helpText);
 
     this._dom.createChildOf(summary, 'div', 'lh-toggle-arrow', {title: 'See resources'});
 
