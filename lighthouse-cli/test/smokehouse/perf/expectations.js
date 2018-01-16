@@ -36,6 +36,15 @@ module.exports = [
         // Can be flaky, so test float rawValue instead of boolean score
         rawValue: '<1000',
       },
+      'uses-rel-preload': {
+        score: 0,
+        rawValue: '>500',
+        details: {
+          items: {
+            length: 1,
+          },
+        },
+      },
     },
   },
   {

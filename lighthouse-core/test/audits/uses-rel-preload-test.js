@@ -10,8 +10,11 @@
 
 const UsesRelPreload = require('../../audits/uses-rel-preload.js');
 const assert = require('assert');
+const defaultMainResource = {
+  _endTime: 1,
+};
 
-const mockArtifacts = (networkRecords, mockChain) => {
+const mockArtifacts = (networkRecords, mockChain, mainResource = defaultMainResource) => {
   return {
     devtoolsLogs: {
       [UsesRelPreload.DEFAULT_PASS]: [],
@@ -21,16 +24,23 @@ const mockArtifacts = (networkRecords, mockChain) => {
     },
     requestNetworkRecords: () => networkRecords,
     requestMainResource: () => {
-      return Promise.resolve({
-        _endTime: 1,
-      });
+      return Promise.resolve(mainResource);
     },
   };
 };
 
 describe('Performance: uses-rel-preload audit', () => {
   it(`should suggest preload resource`, () => {
+    const mainResource = Object.assign({}, defaultMainResource, {
+      redirects: [''],
+    });
     const networkRecords = [
+      {
+        requestId: '2',
+        _endTime: 1,
+        _isLinkPreload: false,
+        _url: 'http://www.example.com',
+      },
       {
         requestId: '3',
         _startTime: 10,
@@ -45,6 +55,12 @@ describe('Performance: uses-rel-preload audit', () => {
             children: {
               '3': {
                 request: networkRecords[0],
+                children: {
+                  '4': {
+                    request: networkRecords[1],
+                    children: {},
+                  },
+                },
               },
             },
           },
@@ -52,10 +68,11 @@ describe('Performance: uses-rel-preload audit', () => {
       },
     };
 
-    return UsesRelPreload.audit(mockArtifacts(networkRecords, chains)).then(output => {
-      assert.equal(output.rawValue, 9000);
-      assert.equal(output.details.items.length, 1);
-    });
+    return UsesRelPreload.audit(mockArtifacts(networkRecords, chains, mainResource))
+      .then(output => {
+        assert.equal(output.rawValue, 9000);
+        assert.equal(output.details.items.length, 1);
+      });
   });
 
   it(`shouldn't suggest preload for already preloaded records`, () => {
@@ -74,6 +91,7 @@ describe('Performance: uses-rel-preload audit', () => {
             children: {
               '3': {
                 request: networkRecords[0],
+                children: {},
               },
             },
           },
@@ -103,6 +121,7 @@ describe('Performance: uses-rel-preload audit', () => {
             children: {
               '3': {
                 request: networkRecords[0],
+                children: {},
               },
             },
           },

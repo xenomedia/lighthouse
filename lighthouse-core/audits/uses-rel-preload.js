@@ -64,8 +64,9 @@ class UsesRelPreloadAudit extends Audit {
       let maxWasted = 0;
       // get all critical requests 2 + mainResourceIndex levels deep
       const mainResourceIndex = mainResource.redirects ? mainResource.redirects.length : 0;
+
       const criticalRequests = UsesRelPreloadAudit._flattenRequests(critChains,
-        3 + mainResourceIndex,2 + mainResourceIndex);
+        3 + mainResourceIndex, 2 + mainResourceIndex);
       criticalRequests.forEach(request => {
         const networkRecord = request;
         if (!networkRecord._isLinkPreload && networkRecord.protocol !== 'data') {
