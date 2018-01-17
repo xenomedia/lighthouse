@@ -6,4 +6,4 @@
 
 /* eslint-disable */
 
-document.write('<script src="level-3.js?delay=500"></script>');
+document.write('<script src="level-3.js"></script>');

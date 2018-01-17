@@ -10,8 +10,8 @@
  */
 module.exports = [
   {
-    initialUrl: 'http://localhost:10200/online-only.html',
-    url: 'http://localhost:10200/online-only.html',
+    initialUrl: 'http://localhost:10200/preload.html',
+    url: 'http://localhost:10200/preload.html',
     audits: {
       'speed-index-metric': {
         score: '>=90',
@@ -36,27 +36,18 @@ module.exports = [
         // Can be flaky, so test float rawValue instead of boolean score
         rawValue: '<1000',
       },
+    },
+  },
+  {
+    initialUrl: 'http://localhost:10200/preload.html',
+    url: 'http://localhost:10200/preload.html',
+    audits: {
       'uses-rel-preload': {
-        score: 0,
+        score: '<100',
         rawValue: '>500',
         details: {
           items: {
             length: 1,
-          },
-        },
-      },
-    },
-  },
-  {
-    initialUrl: 'https://jakearchibald.github.io/svgomg/',
-    url: 'https://jakearchibald.github.io/svgomg/',
-    audits: {
-      'uses-rel-preload': {
-        score: 0,
-        rawValue: '>1000',
-        details: {
-          items: {
-            length: 3,
           },
         },
       },
