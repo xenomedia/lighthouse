@@ -149,16 +149,18 @@ class GatherRunner {
       return URL.equalWithExcludedFragments(record.url, url);
     });
 
-    let errorMessage;
+    let errorReason;
     if (!mainRecord) {
-      errorMessage = 'no document request found';
+      errorReason = 'no document request found';
     } else if (mainRecord.failed) {
-      errorMessage = `failed document request (${mainRecord.localizedFailDescription})`;
+      errorReason = `failed document request (${mainRecord.localizedFailDescription})`;
     }
 
-    if (errorMessage) {
-      log.error('GatherRunner', errorMessage, url);
-      const error = new Error(`Unable to load page: ${errorMessage}`);
+    if (errorReason) {
+      log.error('GatherRunner', errorReason, url);
+      const msg = 'Your page failed to load. Verify that the URL is valid and re-run Lighthouse.';
+      const error = new Error(msg);
+      error.reason = errorReason;
       error.code = 'PAGE_LOAD_ERROR';
       return error;
     }

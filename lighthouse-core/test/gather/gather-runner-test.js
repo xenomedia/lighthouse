@@ -676,14 +676,14 @@ describe('GatherRunner', function() {
       const url = 'http://the-page.com';
       const records = [{url, failed: true, localizedFailDescription: 'foobar'}];
       const error = GatherRunner.getPageLoadError(url, records);
-      assert.ok(error && /Unable.*foobar/.test(error.message));
+      assert.ok(error && /Your page failed to load/.test(error.message));
     });
 
     it('throws when page times out', () => {
       const url = 'http://the-page.com';
       const records = [];
       const error = GatherRunner.getPageLoadError(url, records);
-      assert.ok(error && /Unable.*no document request/.test(error.message));
+      assert.ok(error && /Your page failed to load/.test(error.message));
     });
   });
 
