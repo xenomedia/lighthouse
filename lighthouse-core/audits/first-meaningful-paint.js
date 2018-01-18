@@ -6,8 +6,8 @@
 'use strict';
 
 const Audit = require('./audit');
-const Util = require('../report/v2/renderer/util.js');
-const LHError = require('../lib/errors.js');
+const Util = require('../report/v2/renderer/util');
+const LHError = require('../lib/errors');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
 // https://www.desmos.com/calculator/joz3pqttdq
