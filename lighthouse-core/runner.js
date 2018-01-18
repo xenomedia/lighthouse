@@ -254,7 +254,11 @@ class Runner {
 
       Sentry.captureException(err, {tags: {audit: audit.meta.name}, level: 'error'});
       // Non-fatal error become error audit result.
-      const debugString = err.friendlyMessage || `Audit error: ${err.message}`;
+      let debugString = `Audit error: ${err.message}`;
+      if (err.friendlyMessage) {
+        debugString = `${err.friendlyMessage} (${err.message})`;
+      }
+
       return Audit.generateErrorAuditResult(audit, debugString);
     }).then(result => {
       log.verbose('statusEnd', status);
