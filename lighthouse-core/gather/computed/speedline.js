@@ -33,7 +33,7 @@ class Speedline extends ComputedArtifact {
         include: 'perceptualSpeedIndex',
       });
     }).catch(err => {
-      if (/no screenshots/.test(err.message)) {
+      if (/No screenshots found in trace/.test(err.message)) {
         throw new LHError(LHError.errors.NO_SCREENSHOTS);
       }
 
