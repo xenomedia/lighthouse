@@ -7,29 +7,86 @@
 
 const strings = require('./strings');
 
+/**
+ * @typedef LighthouseErrorDefinition
+ * @property {string} code
+ * @property {string} message
+ * @property {RegExp|undefined} pattern
+ */
+
 class LighthouseError extends Error {
-  constructor(errorDefinition) {
+  /**
+   * @param {!LighthouseErrorDefinition} errorDefinition
+   * @param {!Object=} properties
+   */
+  constructor(errorDefinition, properties) {
     super(errorDefinition.code);
-    Error.captureStackTrace(this, LighthouseError);
+    this.name = 'LHError';
+    this.code = errorDefinition.code;
     this.friendlyMessage = errorDefinition.message;
+    if (properties) Object.assign(this, properties);
+
+    Error.captureStackTrace(this, LighthouseError);
+  }
+
+  /**
+   * @param {!LH.LighthouseError} err
+   */
+  static isPageLoadError(err) {
+    return err.code === errors.NO_DOCUMENT_REQUEST.code ||
+      err.code === errors.FAILED_DOCUMENT_REQUEST.code;
+  }
+
+  /**
+   * @param {string} method
+   * @param {{message: string, data: string|undefined}} protocolError
+   * @return {!Error|LighthouseError}
+   */
+  static fromProtocolMessage(method, protocolError) {
+    const matchedErrorDefinition = protocolErrors.find(e => e.pattern.test(protocolError.message));
+    if (matchedErrorDefinition) {
+      return new LighthouseError(matchedErrorDefinition, {
+        protocolMethod: method,
+        protocolError: protocolError.message,
+      });
+    }
+
+    let errMsg = `(${method}): ${protocolError.message}`;
+    if (protocolError.data) errMsg += ` (${protocolError.data})`;
+    const error = new Error(`Protocol error ${errMsg}`);
+    return Object.assign(error, {protocolMethod: method, protocolError: protocolError.message});
   }
 }
 
 const errors = {
+  // Screenshot/speedline errors
   NO_SPEEDLINE_FRAMES: {message: strings.didntCollectScreenshots},
   SPEEDINDEX_OF_ZERO: {message: strings.didntCollectScreenshots},
   NO_SCREENSHOTS: {message: strings.didntCollectScreenshots},
 
+  // Trace parsing errors
   NO_TRACING_STARTED: {message: strings.badTraceRecording},
   NO_NAVSTART: {message: strings.badTraceRecording},
   NO_FMP: {message: strings.badTraceRecording},
   NO_DCL: {message: strings.badTraceRecording},
 
+  // TTFI/TTCI calculation failures
   FMP_TOO_LATE_FOR_FCPUI: {message: strings.pageLoadTookTooLong},
   NO_FCPUI_IDLE_PERIOD: {message: strings.pageLoadTookTooLong},
   NO_TTI_CPU_IDLE_PERIOD: {message: strings.pageLoadTookTooLong},
   NO_TTI_NETWORK_IDLE_PERIOD: {message: strings.pageLoadTookTooLong},
+
+  // Page load failures
+  NO_DOCUMENT_REQUEST: {message: strings.pageLoadFailed},
+  FAILED_DOCUMENT_REQUEST: {message: strings.pageLoadFailed},
+
+  // Protocol internal failures
+  TRACING_ALREADY_STARTED: {message: strings.internalChromeError, pattern: /Tracing.*started/},
+  PARSING_PROBLEM: {message: strings.internalChromeError, pattern: /Parsing problem/},
+  READ_FAILED: {message: strings.internalChromeError, pattern: /Read failed/},
 };
+
+const protocolErrors = Object.keys(errors).filter(k => errors[k].pattern).map(k => errors[k]);
 
 Object.keys(errors).forEach(code => errors[code].code = code);
 

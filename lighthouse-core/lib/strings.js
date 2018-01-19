@@ -10,4 +10,6 @@ module.exports = {
   didntCollectScreenshots: `Chrome didn't collect any screenshots during the page load. Please make sure there is content visible on the page, and then try re-running Lighthouse.`,
   badTraceRecording: `Something went wrong with recording the trace over your page load. Please run Lighthouse again.`,
   pageLoadTookTooLong: `Your page took too long to load. Please follow the opportunities in the report to reduce your page load time, and then try re-running Lighthouse.`,
+  pageLoadFailed: `Your page failed to load. Verify that the URL is valid and re-run Lighthouse.`,
+  internalChromeError: `An internal Chrome error occurred. Please restart Chrome and try re-running Lighthouse.`,
 };

@@ -28,7 +28,7 @@ describe('FirstInteractive computed artifact:', () => {
     return computedArtifacts.requestFirstInteractive({traceEvents: tooShortTrace}).then(() => {
       assert.ok(false, 'should have thrown for short trace');
     }).catch(err => {
-      assert.ok(err.message, 'FMP_TOO_LATE_FOR_FCPUI');
+      assert.equal(err.message, 'FMP_TOO_LATE_FOR_FCPUI');
     });
   });
 

@@ -8,6 +8,7 @@
 
 const log = require('lighthouse-logger');
 const Audit = require('../audits/audit');
+const LHError = require('../lib/errors');
 const URL = require('../lib/url-shim');
 const NetworkRecorder = require('../lib/network-recorder.js');
 
@@ -149,19 +150,18 @@ class GatherRunner {
       return URL.equalWithExcludedFragments(record.url, url);
     });
 
+    let errorCode;
     let errorReason;
     if (!mainRecord) {
-      errorReason = 'no document request found';
+      errorCode = LHError.errors.NO_DOCUMENT_REQUEST;
     } else if (mainRecord.failed) {
-      errorReason = `failed document request (${mainRecord.localizedFailDescription})`;
+      errorCode = LHError.errors.FAILED_DOCUMENT_REQUEST;
+      errorReason = mainRecord.localizedFailDescription;
     }
 
-    if (errorReason) {
-      log.error('GatherRunner', errorReason, url);
-      const msg = 'Your page failed to load. Verify that the URL is valid and re-run Lighthouse.';
-      const error = new Error(msg);
-      error.reason = errorReason;
-      error.code = 'PAGE_LOAD_ERROR';
+    if (errorCode) {
+      const error = new LHError(errorCode, {reason: errorReason});
+      log.error('GatherRunner', error.message, url);
       return error;
     }
   }
@@ -357,7 +357,7 @@ class GatherRunner {
           // runner to handle turning it into an error audit.
           artifacts[gathererName] = err;
           // Track page load errors separately, so we can fail loudly if needed.
-          if (err.code === 'PAGE_LOAD_ERROR') pageLoadFailures.push(err);
+          if (LHError.isPageLoadError(err)) pageLoadFailures.push(err);
         });
       });
     }, Promise.resolve()).then(_ => {
