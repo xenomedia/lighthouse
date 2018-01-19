@@ -55,7 +55,7 @@ const NetworkRecorder = require('../lib/network-recorder.js');
  */
 class GatherRunner {
   /**
-   * Loads about:blank and waits there briefly. Since a Page.reload command does
+   * Loads a blank page and waits there briefly. Since a Page.reload command does
    * not let a service worker take over, we navigate away and then come back to
    * reload. We do not `waitForLoad` on about:blank since a page load event is
    * never fired on it.
@@ -64,8 +64,13 @@ class GatherRunner {
    * @param {number=} duration
    * @return {!Promise}
    */
-  static loadBlank(driver, url = 'about:blank', duration = 300) {
-    return driver.gotoURL(url).then(_ => new Promise(resolve => setTimeout(resolve, duration)));
+  static loadBlank(driver, url) {
+    // The real about:blank doesn't fire onload and is full of mysteries
+    //   https://github.com/whatwg/html/issues/816#issuecomment-288931753
+    // To improve speed and avoid anomalies, we use a basic data uri blank page
+    url = url || 'data:text/html,<!doctype html><title>Resetting Page...</title>';
+    const {promise} = driver._waitForLoadEvent(0);
+    return driver.gotoURL(url).then(promise);
   }
 
   /**
@@ -193,8 +198,7 @@ class GatherRunner {
     const blockedUrls = (options.config.blockedUrlPatterns || [])
       .concat(options.flags.blockedUrlPatterns || []);
     const blankPage = options.config.blankPage;
-    const blankDuration = options.config.blankDuration;
-    const pass = GatherRunner.loadBlank(options.driver, blankPage, blankDuration)
+    const pass = GatherRunner.loadBlank(options.driver, blankPage)
         // Set request blocking before any network activity
         // No "clearing" is done at the end of the pass since blockUrlPatterns([]) will unset all if
         // neccessary at the beginning of the next pass.
