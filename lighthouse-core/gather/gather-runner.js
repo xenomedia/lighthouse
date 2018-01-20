@@ -11,7 +11,7 @@ const log = require('lighthouse-logger');
 const Audit = require('../audits/audit');
 const URL = require('../lib/url-shim');
 const NetworkRecorder = require('../lib/network-recorder.js');
-const blankPageSource = fs.readFileSync(`${__dirname}/blank-page.html`, 'utf8');
+const blankPageSource = fs.readFileSync(__dirname + '/blank-page.html', 'utf8');
 
 /**
  * @typedef {!Object<string, !Array<!Promise<*>>>} GathererResults
