@@ -5,11 +5,13 @@
  */
 // @ts-nocheck
 'use strict';
+const fs = require('fs');
 
 const log = require('lighthouse-logger');
 const Audit = require('../audits/audit');
 const URL = require('../lib/url-shim');
 const NetworkRecorder = require('../lib/network-recorder.js');
+const blankPageSource = fs.readFileSync(`${__dirname}/blank-page.html`, 'utf8');
 
 /**
  * @typedef {!Object<string, !Array<!Promise<*>>>} GathererResults
@@ -68,10 +70,7 @@ class GatherRunner {
     // The real about:blank doesn't fire onload and is full of mysteries
     //   https://github.com/whatwg/html/issues/816#issuecomment-288931753
     // To improve speed and avoid anomalies, we use a basic data uri blank page
-    url = url || `data:text/html,
-    <!doctype html><title>Resetting Page...</title>
-    <body style="background: hsl(231, 99%, 95%)">
-    `;
+    url = url || `data:text/html,${blankPageSource}`;
     return driver.gotoURL(url).then(_ => driver.waitForLoadEvent());
   }
 
