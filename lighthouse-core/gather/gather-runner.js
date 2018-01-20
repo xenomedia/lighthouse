@@ -68,9 +68,11 @@ class GatherRunner {
     // The real about:blank doesn't fire onload and is full of mysteries
     //   https://github.com/whatwg/html/issues/816#issuecomment-288931753
     // To improve speed and avoid anomalies, we use a basic data uri blank page
-    url = url || 'data:text/html,<!doctype html><title>Resetting Page...</title>';
-    const {promise} = driver._waitForLoadEvent(0);
-    return driver.gotoURL(url).then(promise);
+    url = url || `data:text/html,
+    <!doctype html><title>Resetting Page...</title>
+    <body style="background: hsl(231, 99%, 95%)">
+    `;
+    return driver.gotoURL(url).then(driver.waitForLoadEvent.bind(driver));
   }
 
   /**
