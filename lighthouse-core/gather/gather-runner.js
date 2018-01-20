@@ -72,7 +72,7 @@ class GatherRunner {
     <!doctype html><title>Resetting Page...</title>
     <body style="background: hsl(231, 99%, 95%)">
     `;
-    return driver.gotoURL(url).then(driver.waitForLoadEvent.bind(driver));
+    return driver.gotoURL(url).then(_ => driver.waitForLoadEvent());
   }
 
   /**

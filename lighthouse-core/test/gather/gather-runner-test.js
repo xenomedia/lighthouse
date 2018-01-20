@@ -55,6 +55,9 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn, blo
     getUserAgent() {
       return Promise.resolve('Fake user agent');
     }
+    waitForLoadEvent() {
+      return Promise.resolve();
+    }
   };
   const EmulationMock = class extends Connection {
     sendCommand(command, params) {
